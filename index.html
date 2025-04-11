@@ -12,6 +12,19 @@
       margin: 0;
       padding: 0;
     }
+    .navbar {
+      background-color: #2c3e50;
+      color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navbar select {
+      padding: 6px;
+      font-size: 16px;
+      border-radius: 4px;
+    }
     .container {
       max-width: 960px;
       margin: 0 auto;
@@ -41,12 +54,43 @@
       color: #2980b9;
       font-weight: bold;
     }
+    .timeline {
+      background-color: #f9f9ff;
+      border-left: 4px solid #8e44ad;
+      padding: 12px;
+      margin-top: 30px;
+      margin-bottom: 30px;
+    }
   </style>
 </head>
 <body>
+
+<div class="navbar">
+  <div><strong>CyberSec Warfare</strong> – Home</div>
+  <select onchange="location = this.value;">
+    <option value="#">Select Tool</option>
+    <option value="autored.html">AutoRed</option>
+    <option value="autoblue.html">AutoBlue</option>
+    <option value="sla_watchdog.html">SLAWatchdog</option>
+    <option value="riskrank_ai.html">RiskRank-AI</option>
+    <option value="webhound_ai.html">WebHound-AI</option>
+  </select>
+</div>
+
 <div class="container">
 
-<h1>CyberSec Warfare: Offensive + Defensive Vulnerability Automation Lab</h1>
+<h1>If You Hire Me — Here's the Plan:</h1>
+<div class="explanation">
+  <strong>Deployment Timeline:</strong><br>
+  <ul>
+    <li><strong>Week 1:</strong> Audit existing detection rules, deploy AutoRed + RiskRank-AI into staging</li>
+    <li><strong>Week 2:</strong> Launch full AutoBlue patch validation across IoT/OT/AI + integrate SLAWatchdog</li>
+    <li><strong>Week 3:</strong> Ingest and visualize real risk logs in Splunk/Sentinel/Power BI</li>
+    <li><strong>Week 4:</strong> Tune SIEM alerts, run red team simulations, deliver MTTR report</li>
+    <li><strong>End of Month:</strong> Deliver full CTEM stack with documentation and compliance alignment</li>
+  </ul>
+</div>
+
 
 <div class="explanation">
   <strong>Author:</strong> Dylan Leonard<br>
