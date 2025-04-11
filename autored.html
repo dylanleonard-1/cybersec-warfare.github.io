@@ -86,10 +86,10 @@
   Cron → AutoRed Modules → Simulated Attacks → JSON Logs → SIEM (Splunk/Sentinel) → Detection/MTTR Tuning
 </div>
 
-<h2>💡 Use Case</h2>
+<h2>Use Case</h2>
 <p>AutoRed was used to simulate a credential phishing attack in a hospital network. Within 9 minutes, SOAR flagged 3 of 5 phishing emails. After tuning detection rules, a re-test reduced the MTTR to <strong>under 2 minutes</strong>. This iterative red-blue testing led to permanent rule improvements.</p>
 
-<h2>🔧 Core Modules & Code</h2>
+<h2>Core Modules & Code</h2>
 
 <h3>1. Log Generator (Universal Telemetry)</h3>
 <p>Creates structured JSON logs for every attack and stores them in `/var/log`. Can also be forwarded to SIEMs.</p>
@@ -183,7 +183,7 @@
                 continue
 </code></pre>
 
-<h2>🔍 Tool Summary</h2>
+<h2>Tool Summary</h2>
 <p>
 AutoRed is trusted by red teams, detection engineers, and SOCs for emulating attacker behavior in a safe, measurable way. Each module logs every step with a MITRE TID, supports cron-based automation, and integrates seamlessly with SIEMs like Splunk and Sentinel.
 </p>
