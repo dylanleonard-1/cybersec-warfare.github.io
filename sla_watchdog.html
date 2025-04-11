@@ -9,7 +9,26 @@
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f9;
-      margin: 20px;
+      margin: 0;
+      padding: 0;
+    }
+    .navbar {
+      background-color: #2c3e50;
+      color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navbar select {
+      padding: 6px;
+      font-size: 16px;
+      border-radius: 4px;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 20px;
     }
     h1, h2 {
       color: #2c3e50;
@@ -39,6 +58,20 @@
   </style>
 </head>
 <body>
+
+<div class="navbar">
+  <div><strong>CyberSec Warfare</strong> – SLAWatchdog</div>
+  <select onchange="location = this.value;">
+    <option value="#">Select Tool</option>
+    <option value="index.html">🏠 Home</option>
+    <option value="autored.html">AutoRed</option>
+    <option value="autoblue.html">AutoBlue</option>
+    <option value="riskrank_ai.html">RiskRank-AI</option>
+    <option value="webhound_ai.html">WebHound-AI</option>
+  </select>
+</div>
+
+<div class="container">
 
 <h1>SLAWatchdog + AutoPatch: Closing the Loop on Vulnerability Remediation</h1>
 
@@ -129,5 +162,6 @@ def send_sla_alert(cve_id, status):
 SLAWatchdog ensures that patches aren’t just promised—they’re proven. If the AutoPatch system hasn’t logged a success, SLAWatchdog sounds the alarm—before it’s too late. This closes the gap between ticket tracking and real security enforcement.
 </p>
 
+</div>
 </body>
 </html>
