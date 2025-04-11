@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +8,26 @@
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f9;
-      margin: 20px;
+      margin: 0;
+      padding: 0;
+    }
+    .navbar {
+      background-color: #2c3e50;
+      color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navbar select {
+      padding: 6px;
+      font-size: 16px;
+      border-radius: 4px;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 20px;
     }
     h1, h2 {
       color: #2c3e50;
@@ -39,6 +57,20 @@
   </style>
 </head>
 <body>
+
+<div class="navbar">
+  <div><strong>CyberSec Warfare</strong> – RiskRank-AI</div>
+  <select onchange="location = this.value;">
+    <option value="#">Select Tool</option>
+    <option value="index.html">🏠 Home</option>
+    <option value="autored.html">AutoRed</option>
+    <option value="autoblue.html">AutoBlue</option>
+    <option value="sla_watchdog.html">SLAWatchdog</option>
+    <option value="webhound_ai.html">WebHound-AI</option>
+  </select>
+</div>
+
+<div class="container">
 
 <h1>RiskRank-AI: Automated CVE Prioritization with CVSS + EPSS + SLA</h1>
 
@@ -136,5 +168,6 @@ def forward_to_siem(log):
 RiskRank-AI converts raw CVE feeds into prioritized, risk-tagged decisions. It adds context, calculates urgency, and sends JSON logs for dashboards and automation. No more guessing. Fix what matters.
 </p>
 
+</div>
 </body>
 </html>
