@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CyberSec Warfare - CVS Strategy and Architecture</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1, h2, h3 {
+      color: #2c3e50;
+    }
+    pre {
+      background-color: #2e3c56;
+      color: #f8f8f2;
+      padding: 20px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    .explanation {
+      background-color: #eaf4ff;
+      border-left: 4px solid #2980b9;
+      padding: 12px;
+      margin-bottom: 25px;
+    }
+    ul {
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    a {
+      color: #2980b9;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+<h1>CyberSec Warfare: Offensive + Defensive Vulnerability Automation Lab</h1>
+
+<div class="explanation">
+  <strong>Author:</strong> Dylan Leonard<br>
+  <strong>Company:</strong> CyberSec Warfare<br>
+  <strong>Mission:</strong> Training the next wave of defenders and automating real-world security.
+</div>
+
+<h2>About Me</h2>
+<p>I build tools that simulate real threats, automate defense, and teach people how to respond. Through my company <strong>CyberSec Warfare</strong>, I’ve developed a full-cycle ecosystem for red + blue team simulation, AI-powered threat detection, and compliance-ready patching systems.</p>
+<ul>
+  <li>Personal cybersecurity training environments</li>
+  <li>Real client defenses across healthcare, fintech, and retail</li>
+  <li>Continuous SIEM/SOAR-based validation and threat simulation</li>
+</ul>
+
+<h2>CVS Health Alignment</h2>
+<p>After analyzing CVS Health’s public misconfiguration breach in 2021 (1B+ session/device records exposed), I identified multiple ways to proactively prevent such threats across:</p>
+<ul>
+  <li>OT (Operational Technology)</li>
+  <li>IoT (Internet of Things)</li>
+  <li>AI/ML Security</li>
+</ul>
+<p>I mapped my existing tools into a complete CTEM (Continuous Threat Exposure Management) solution designed for real-time visibility, SLA enforcement, and remediation at scale.</p>
+
+<h2>CyberSec Warfare Platform Architecture (Enterprise-Integrated Diagram)</h2>
+<pre>
+                          [ Executive Dashboard / Compliance / CISO ]
+                                          ▲
+                                          │
+                                          ▼
+                           ┌─────────────────────────────┐
+                           │  Splunk / Microsoft Sentinel│
+                           └─────┬───────────────────────┘
+                                 │  Receives logs + alerts
+                                 ▼
+      ┌────────────┬────────────┴────────────┬────────────┐
+      ▼            ▼                         ▼            ▼
+[RiskRank-AI]  [SLAWatchdog]           [AutoBlue]   [WebHound-AI]
+  ▲                ▲                      ▲             ▲
+  │                │                      │             │
+  │     ┌──────────┴───────────┐   ┌──────┴────────┐    │
+  │     │     CVSS / EPSS      │   │ Patch Validation │  │
+  │     │  Asset Criticality   │   │ SHA256, Timestamp│  │
+  │     └──────────┬───────────┘   └─────────────────┘  │
+  │                │                                    │
+  ▼                ▼                                    ▼
+[Prioritized CVEs] ────────────────┐        [Browser Threats: JS, C2, Redirects]
+                                   ▼
+                             ┌────────────┐
+                             │ AutoRed    │
+                             └────┬───────┘
+                                  ▼
+               [Red Team TTPs: Phishing, SQLi, Lateral, Beaconing]
+                                  ▼
+                             JSON logs (MITRE aligned)
+
+                ◄────────────────────[ FEEDS BACK ]────────────────────►
+                        To SIEM dashboards, SOAR playbooks, alerts
+
+──────────────────────────── External Data Sources ────────────────────────────
+
+[Employee Devices / Workstations]       [IoT/OT Devices: HVAC, Sensors, RFID]
+        │                                         │
+        ▼                                         ▼
+┌────────────────────┐                  ┌────────────────────────────┐
+│     CVE Scanning   │◄─Input──────────▶│ Protocol Scanning (Zigbee, │
+│ (Tenable / Qualys) │                  │ MQTT, CoAP, Bluetooth)     │
+└────────────────────┘                  └────────────────────────────┘
+        │                                         │
+        ▼                                         ▼
+[Device Risk Feed]                         [Firmware + API Vulnerability Scan]
+        │                                         │
+        └───────► Sent to CTEM Pipeline ──────────┘
+</pre>
+
+<h3>Legend</h3>
+<ul>
+  <li>Arrows show telemetry flow and threat injection/detection feedback loops</li>
+  <li>External devices (employees, OT/IoT) contribute vulnerabilities or are test targets</li>
+  <li>Splunk/Sentinel receive ALL output: telemetry, alerts, CVE reports, and breach simulations</li>
+  <li>All tools modular and ready for compliance use (HIPAA, PCI-DSS, ISO 27001, NIST 800-53)</li>
+</ul>
+
+<h2>Tool Breakdown</h2>
+
+<h3>1. AutoRed – MITRE-Adversary Simulation</h3>
+<ul>
+  <li>T1566 (Phish), T1110.001 (SSH), T1190 (SQLi), T1021 (Lateral), T1071 (C2)</li>
+  <li>Simulates active threats + logs real telemetry to Splunk/Sentinel</li>
+  <li>Measures MTTR, alert response, and blue team visibility</li>
+</ul>
+<p><a href="autored_perfect_final.html">→ View AutoRed Simulation</a></p>
+
+<h3>2. RiskRank-AI – Dynamic CVE Risk Prioritization</h3>
+<ul>
+  <li>Combines CVSS, EPSS, asset criticality, and SLA logic</li>
+  <li>Generates ranked CVE list with tags + remediation timelines</li>
+</ul>
+<p><a href="riskrank_ai.html">→ View RiskRank-AI</a></p>
+
+<h3>3. SLAWatchdog – SLA Enforcement & Escalation</h3>
+<ul>
+  <li>Monitors unpatched CVEs</li>
+  <li>Escalates breached SLA targets to Splunk/Sentinel</li>
+  <li>Interfaces directly with AutoBlue patch logs</li>
+</ul>
+<p><a href="sla_watchdog.html">→ View SLA Watchdog</a></p>
+
+<h3>4. AutoBlue – Patch Automation with Proof</h3>
+<ul>
+  <li>Validates patches with pre/post SHA256 hashes</li>
+  <li>Creates compliance-grade JSON reports</li>
+  <li>Integrates with Tenable, Qualys, Prisma</li>
+</ul>
+<p><a href="autoblue.html">→ View AutoBlue Engine</a></p>
+
+<h3>5. WebHound-AI – JavaScript Threat Hunter</h3>
+<ul>
+  <li>Uses Selenium + custom AI pattern scoring</li>
+  <li>Identifies malicious JS (eval, base64, beacons, etc.)</li>
+  <li>Checks external scripts via VirusTotal & URLScan</li>
+</ul>
+<p><a href="webhound_ai.html">→ View WebHound-AI</a></p>
+
+<h2>Contact Me</h2>
+<p>
+  <strong>Dylan Leonard</strong><br>
+  GitHub: <a href="https://github.com/dylanleonard-1">dylanleonard-1</a><br>
+  LinkedIn: <a href="https://linkedin.com/in/dylan-leonard-sec">linkedin.com/in/dylan-leonard-sec</a>
+</p>
+
+</div>
+</body>
+</html>

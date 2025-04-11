@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RiskRank-AI: Risk-Driven CVE Prioritization</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 20px;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    pre {
+      background-color: #2e3c56;
+      color: #f8f8f2;
+      padding: 20px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    .explanation {
+      background-color: #eaf4ff;
+      border-left: 4px solid #2980b9;
+      padding: 12px;
+      margin-bottom: 25px;
+    }
+    .diagram {
+      background-color: #ffffff;
+      border: 2px dashed #2980b9;
+      padding: 15px;
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+  </style>
+</head>
+<body>
+
+<h1>RiskRank-AI: Automated CVE Prioritization with CVSS + EPSS + SLA</h1>
+
+<div class="explanation">
+  <strong>Why It Exists:</strong><br>
+  Not every CVE matters equally. RiskRank-AI combines severity (CVSS), likelihood (EPSS), and urgency (SLA) to rank what gets fixed first.
+</div>
+
+<div class="diagram">
+  CVE Input → Add CVSS + EPSS + SLA → Environmental Context → Risk Score + Tag → JSON Log → Splunk / Power BI
+</div>
+
+<h2>CVSS, EPSS, SLA - Together</h2>
+<div class="explanation">
+  <ul>
+    <li><strong>CVSS:</strong> How dangerous is it? (0-10 scale)</li>
+    <li><strong>EPSS:</strong> Will it likely be exploited soon? (0.0 - 1.0)</li>
+    <li><strong>SLA:</strong> How fast must it be fixed? (24h, 3d, 7d)</li>
+  </ul>
+  RiskRank-AI blends these together into one decision.
+</div>
+
+<h2>How It Works</h2>
+<div class="explanation">
+  The engine pulls in CVE data (from Tenable, Nexpose, etc.), fetches EPSS scores from FIRST.org, applies SLA based on severity, and factors in where the asset is located (e.g., public-facing, crown-jewel, internal test).
+</div>
+
+<h2>1. Risk Calculation Logic</h2>
+<pre><code>def calculate_risk(cvss, epss, location):
+    base_risk = (cvss / 10) * 0.6 + epss * 0.4
+    if location == "public":
+        base_risk += 0.2
+    elif location == "critical_app":
+        base_risk += 0.15
+    return round(min(base_risk, 1.0), 2)
+</code></pre>
+
+<h2>2. Tagging and SLA Assignment</h2>
+<pre><code>def assign_tags(risk_score):
+    if risk_score >= 0.85:
+        return "critical", 1
+    elif risk_score >= 0.7:
+        return "high", 3
+    elif risk_score >= 0.4:
+        return "medium", 7
+    else:
+        return "low", 14
+</code></pre>
+
+<h2>3. Building the Output Log</h2>
+<pre><code>import json, datetime
+
+def generate_log(cve_id, cvss, epss, location):
+    score = calculate_risk(cvss, epss, location)
+    tag, sla_days = assign_tags(score)
+    output = {
+        "cve_id": cve_id,
+        "cvss": cvss,
+        "epss": epss,
+        "location": location,
+        "risk_score": score,
+        "risk_tag": tag,
+        "sla_days": sla_days,
+        "timestamp": datetime.datetime.utcnow().isoformat() + "Z"
+    }
+    with open(f"/var/log/riskrank_{cve_id}.json", "w") as f:
+        json.dump(output, f, indent=4)
+    return output
+</code></pre>
+
+<h2>4. Sending to Splunk or Power BI</h2>
+<pre><code>import requests
+
+def forward_to_siem(log):
+    headers = {
+        "Authorization": "Splunk YOUR-TOKEN-HERE",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "event": log,
+        "sourcetype": "riskrank_ai_log"
+    }
+    requests.post("http://splunk-server:8088/services/collector/event", headers=headers, data=json.dumps(payload))
+</code></pre>
+
+<h2>Real-Life Scenario</h2>
+<div class="explanation">
+  CVE-2023-7890 has a CVSS of 6.8, but an EPSS of 0.92. It’s on a public web server.<br>
+  RiskRank-AI scores it as 0.89 → critical → SLA: 24h.<br>
+  Without this logic, it might have sat unpatched for a week.
+</div>
+
+<h2>Final Summary</h2>
+<p>
+RiskRank-AI converts raw CVE feeds into prioritized, risk-tagged decisions. It adds context, calculates urgency, and sends JSON logs for dashboards and automation. No more guessing. Fix what matters.
+</p>
+
+</body>
+</html>

@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AutoBlue - Advanced Vulnerability Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 20px;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    pre {
+      background-color: #2e3c56;
+      color: #f8f8f2;
+      padding: 20px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    .explanation {
+      background-color: #eaf4ff;
+      border-left: 4px solid #2980b9;
+      padding: 12px;
+      margin-bottom: 25px;
+    }
+    .diagram {
+      background-color: #ffffff;
+      border: 2px dashed #2980b9;
+      padding: 15px;
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+  </style>
+</head>
+<body>
+
+<h1>AutoBlue: Intelligent Vulnerability Remediation for OT, IoT, and AI</h1>
+
+<div class="explanation">
+  <strong>Live System Flow Diagram:</strong><br>
+  Below is a simplified end-to-end architecture of how AutoBlue operates in a real environment.
+</div>
+
+<div class="diagram">
+  Scanner (Tenable / Qualys / Wiz) → AutoBlue Engine → Patch Engine → Hash Validator → JSON Log Generator → Splunk / Sentinel
+</div>
+
+<div class="explanation">
+  <strong>CLI/Cron Automation:</strong><br>
+  AutoBlue can be scheduled using a simple cron job on a Linux server to run every 4 hours:
+</div>
+<pre><code># /etc/cron.d/autoblue
+0 */4 * * * root /usr/local/bin/autoblue_patch_runner.sh >> /var/log/autoblue/cron.log 2>&1</code></pre>
+
+<pre><code># autoblue_patch_runner.sh
+#!/bin/bash
+python3 /opt/autoblue/autoblue.py --scan --patch --report
+</code></pre>
+
+<h2>1. Pre-Patch Hashing</h2>
+<div class="explanation">Securely fingerprint the current state of system files or AI model binaries.</div>
+<pre><code>import hashlib
+
+def generate_file_hash(file_path):
+    sha256_hash = hashlib.sha256()
+    with open(file_path, "rb") as f:
+        for byte_block in iter(lambda: f.read(4096), b""):
+            sha256_hash.update(byte_block)
+    return sha256_hash.hexdigest()</code></pre>
+
+<h2>2. Patch Application</h2>
+<div class="explanation">Apply updates using patch scripts or vendor-provided packages.</div>
+<pre><code>def apply_patch(cve_id, patch_id):
+    print(f"Applying {patch_id} for {cve_id}")
+    return True</code></pre>
+
+<h2>3. Post-Patch Validation</h2>
+<div class="explanation">Confirm patch effectiveness by comparing new and original hashes.</div>
+<pre><code>def compare_hashes(original_hash, new_hash):
+    if original_hash != new_hash:
+        return "Patch Successful"
+    else:
+        return "No Changes Detected"</code></pre>
+
+<h2>4. Patch Report Generation</h2>
+<div class="explanation">Create structured evidence for each patch event.</div>
+<pre><code>import json, datetime
+
+def generate_patch_report(cve_id, patch_id, system_name, result, original_hash, new_hash):
+    report = {
+        "timestamp": datetime.datetime.utcnow().isoformat() + "Z",
+        "cve_id": cve_id,
+        "patch_id": patch_id,
+        "system": system_name,
+        "result": result,
+        "original_hash": original_hash,
+        "new_hash": new_hash,
+        "status": "patched" if result == "Patch Successful" else "failed",
+        "verification": "hash_match" if original_hash != new_hash else "no_change"
+    }
+    with open(f"/var/log/autoblue_{cve_id}.json", "w") as f:
+        json.dump(report, f, indent=4)
+    return report</code></pre>
+
+<h2>5. SIEM Integration</h2>
+<div class="explanation">Send logs to Splunk/Sentinel for real-time audit and CTEM workflows.</div>
+<pre><code>import requests
+
+def forward_to_splunk(report):
+    url = "http://splunk-server:8088/services/collector/event"
+    token = "Splunk-Token-Here"
+    headers = {
+        "Authorization": f"Splunk {token}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "event": report,
+        "sourcetype": "autoblue_patch_log"
+    }
+    response = requests.post(url, headers=headers, data=json.dumps(payload))
+    print("Splunk Response:", response.status_code)</code></pre>
+
+<h2>Final Summary</h2>
+<p>
+AutoBlue enables healthcare, critical infrastructure, and AI-led organizations to automate detection, response, and validation of vulnerabilities 
+across traditional and next-gen assets. From firmware in IoT to Python-trained AI models, it ensures zero-touch patching with full compliance visibility.
+</p>
+
+</body>
+</html>

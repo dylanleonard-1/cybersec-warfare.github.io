@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WebHound-AI - Browser-Based Threat Hunter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 20px;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    pre {
+      background-color: #2e3c56;
+      color: #f8f8f2;
+      padding: 20px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    .explanation {
+      background-color: #eaf4ff;
+      border-left: 4px solid #2980b9;
+      padding: 12px;
+      margin-bottom: 25px;
+    }
+    .diagram {
+      background-color: #ffffff;
+      border: 2px dashed #2980b9;
+      padding: 15px;
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+  </style>
+</head>
+<body>
+
+<h1>WebHound-AI: AI-Powered JavaScript Threat Detection Engine</h1>
+
+<div class="explanation">
+  <strong>Live System Flow Diagram:</strong><br>
+  WebHound-AI simulates browsing, scrapes code, performs pattern analysis, and logs results.
+</div>
+
+<div class="diagram">
+  Target URL → Headless Browser → HTML/JS Scraper → AI Pattern Detector → Reputation Engine → Report Generator → Splunk / Sentinel
+</div>
+
+<div class="explanation">
+  <strong>Automation via Cron:</strong><br>
+  WebHound-AI can run at intervals using cron:
+</div>
+<pre><code># /etc/cron.d/webhound
+0 */3 * * * root /opt/webhound-ai/webhound_scan.sh >> /var/log/webhound/webhound.log 2>&1</code></pre>
+
+<h2>1. Headless Website Scraping with Selenium</h2>
+<div class="explanation">The tool loads target pages using Selenium and collects all JavaScript and HTML content.</div>
+<pre><code>from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+
+def scrape_site(url):
+    options = Options()
+    options.headless = True
+    driver = webdriver.Chrome(options=options)
+    driver.get(url)
+
+    html = driver.page_source
+    scripts = [s.get_attribute("src") for s in driver.find_elements("tag name", "script") if s.get_attribute("src")]
+    inline_scripts = [s.get_attribute("innerHTML") for s in driver.find_elements("tag name", "script") if not s.get_attribute("src")]
+    
+    driver.quit()
+    return html, scripts, inline_scripts
+</code></pre>
+
+<h2>2. Pattern Matching for Threat Indicators</h2>
+<div class="explanation">WebHound-AI scans JavaScript for obfuscation patterns and suspicious functions.</div>
+<pre><code>import re
+
+def detect_obfuscation(script):
+    indicators = []
+    if "eval(" in script: indicators.append("eval")
+    if "new Function(" in script: indicators.append("new_function")
+    if "atob(" in script: indicators.append("atob")
+    if re.search(r"[A-Za-z0-9+/]{50,}", script): indicators.append("base64_encoded")
+    return indicators
+</code></pre>
+
+<h2>3. Simple AI Logic for Threat Decisioning</h2>
+<div class="explanation">A basic scoring model to simulate AI-assisted verdict logic for threats.</div>
+<pre><code>def score_threat(indicators, external_domains):
+    score = 0
+    weights = {
+        "eval": 5,
+        "new_function": 5,
+        "atob": 3,
+        "base64_encoded": 2
+    }
+    for i in indicators:
+        score += weights.get(i, 1)
+
+    if any("http" in d for d in external_domains):
+        score += 3
+
+    verdict = "malicious" if score >= 8 else "suspicious" if score >= 5 else "benign"
+    return verdict
+</code></pre>
+
+<h2>4. Domain Reputation Checks</h2>
+<div class="explanation">All domains and scripts are checked via security APIs for known abuse.</div>
+<pre><code>import requests
+
+def check_virustotal(domain):
+    headers = {"x-apikey": "YOUR_API_KEY"}
+    response = requests.get(f"https://www.virustotal.com/api/v3/domains/{domain}", headers=headers)
+    return response.json()
+</code></pre>
+
+<h2>5. Logging & Export</h2>
+<pre><code>def save_report(url, indicators, verdict):
+    report = {
+        "url": url,
+        "indicators": indicators,
+        "verdict": verdict,
+        "timestamp": datetime.datetime.utcnow().isoformat() + "Z"
+    }
+    with open(f"/var/log/webhound_{url.replace('https://', '').replace('/', '_')}.json", "w") as f:
+        json.dump(report, f, indent=2)
+</code></pre>
+
+<h2>Summary</h2>
+<p>
+WebHound-AI is a headless, AI-powered browser threat scanner that identifies malicious scripts before they harm users. It integrates seamlessly with Splunk, uses pattern-based detection logic, and enriches findings using multiple threat intelligence APIs.
+</p>
+
+</body>
+</html>

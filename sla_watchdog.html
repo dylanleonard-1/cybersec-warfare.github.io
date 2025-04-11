@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SLAWatchdog + AutoPatch Integration (Explained)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 20px;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    pre {
+      background-color: #2e3c56;
+      color: #f8f8f2;
+      padding: 20px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    .explanation {
+      background-color: #eaf4ff;
+      border-left: 4px solid #2980b9;
+      padding: 12px;
+      margin-bottom: 25px;
+    }
+    .diagram {
+      background-color: #ffffff;
+      border: 2px dashed #2980b9;
+      padding: 15px;
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+  </style>
+</head>
+<body>
+
+<h1>SLAWatchdog + AutoPatch: Closing the Loop on Vulnerability Remediation</h1>
+
+<div class="explanation">
+  <strong>Why this matters:</strong><br>
+  Most systems track when a vulnerability is discovered. But not all systems confirm if a patch was actually applied before the SLA timer runs out. This solution ensures every CVE is either patched—or escalated.
+</div>
+
+<div class="diagram">
+  CVE Detected → SLAWatchdog Starts Timer → AutoPatch Log Parsed → SLA Status Evaluated → JSON Alert → Splunk/Sentinel/SOAR
+</div>
+
+<h2>AutoPatch Log Format</h2>
+<div class="explanation">AutoPatch creates a JSON file for each CVE, confirming patch status. SLAWatchdog reads these to validate remediation.</div>
+<pre><code>{
+  "cve_id": "CVE-2023-1234",
+  "patch_id": "Patch-42",
+  "result": "Patch Successful",
+  "timestamp": "2024-04-01T10:00:00Z"
+}</code></pre>
+
+<h2>1. Checking Patch Status via Log File</h2>
+<div class="explanation">This function looks for a log named after the CVE (e.g., <code>autoblue_CVE-2023-1234.json</code>). If it exists and says “Patch Successful”, SLA is cleared.</div>
+<pre><code>import json
+import os
+
+def check_patch_status(cve_id):
+    try:
+        with open(f"/var/log/autoblue_{cve_id}.json") as f:
+            data = json.load(f)
+            return data["result"] == "Patch Successful"
+    except FileNotFoundError:
+        return False
+</code></pre>
+
+<h2>2. SLA Deadline & Escalation Check</h2>
+<div class="explanation">
+  This checks the severity of the CVE and calculates how long you have before the SLA expires.<br>
+  If the patch is missing and the deadline has passed, it escalates the issue immediately.
+</div>
+<pre><code>from datetime import datetime, timedelta
+
+def check_sla(cve_id, detected_time, severity):
+    sla_days = {"critical": 1, "high": 3, "medium": 7}
+    deadline = detected_time + timedelta(days=sla_days[severity])
+    now = datetime.utcnow()
+    is_patched = check_patch_status(cve_id)
+
+    if is_patched:
+        return "Patched in time"
+    elif now > deadline:
+        send_sla_alert(cve_id, "breach")
+        return "SLA breached"
+    else:
+        send_sla_alert(cve_id, "warning")
+        return "SLA warning"
+</code></pre>
+
+<h2>3. Sending Alerts to Splunk/Sentinel</h2>
+<div class="explanation">This builds a JSON message and sends it to Splunk using the HTTP Event Collector (HEC). It includes SLA status and timestamp for dashboards.</div>
+<pre><code>import requests
+
+def send_sla_alert(cve_id, status):
+    log = {
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "cve_id": cve_id,
+        "sla_status": status,
+        "source": "SLAWatchdog",
+        "message": f"SLA {status.upper()} for {cve_id}"
+    }
+
+    headers = {
+        "Authorization": "Splunk YOUR-TOKEN-HERE",
+        "Content-Type": "application/json"
+    }
+    requests.post("http://splunk-server:8088/services/collector/event", headers=headers, data=json.dumps({"event": log}))
+</code></pre>
+
+<h2>Use Case Example</h2>
+<div class="explanation">
+  <strong>Example:</strong> <br>
+  A critical CVE (CVE-2023-1234) was detected at 9:00 AM UTC on April 1. AutoPatch has not logged it by 9:01 AM UTC April 2. SLAWatchdog sends a breach alert to Splunk.<br><br>
+  If patched earlier, SLAWatchdog logs "Patched in time" and stores the report.
+</div>
+
+<h2>Final Takeaway</h2>
+<p>
+SLAWatchdog ensures that patches aren’t just promised—they’re proven. If the AutoPatch system hasn’t logged a success, SLAWatchdog sounds the alarm—before it’s too late. This closes the gap between ticket tracking and real security enforcement.
+</p>
+
+</body>
+</html>
